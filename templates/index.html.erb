@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="900">
+  <title>Oleaje – <%= h(station_name) %></title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1.5rem; color: #222; }
+    table { border-collapse: collapse; }
+    .table-wrap { overflow-x: auto; }
+    th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; white-space: nowrap; }
+    th { background: #2274a5; color: #fff; }
+    tr.past { color: #aaa; }
+    tr.now { background: #ceecff; font-weight: bold; }
+    footer { margin-top: 1rem; font-size: 0.85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Oleaje – <%= h(station_name) %></h1>
+  <p>Previsión SIWANA (Puertos del Estado). Hora local Europe/Madrid.</p>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha/Hora</th>
+        <th>Altura significante Hm0 (m)</th>
+        <th>Periodo de pico Tp (s)</th>
+        <th>Periodo medio Tm02 (s)</th>
+        <th>Dir. media propagación</th>
+      </tr>
+    </thead>
+    <tbody>
+<% rows.each do |row| -%>
+      <tr data-epoch="<%= row.time.to_i %>">
+        <td><%= row.time.strftime('%Y-%m-%d %H:%M') %></td>
+        <td><%= format('%.2f', row.wave_height) %></td>
+        <td><%= format('%.1f', row.peak_period) %></td>
+        <td><%= format('%.1f', row.mean_period) %></td>
+        <td title="<%= row.direction_degrees.round %>º"><%= row.direction %></td>
+      </tr>
+<% end -%>
+    </tbody>
+  </table>
+  </div>
+  <footer>
+    Actualizado: <%= generated_at.strftime('%Y-%m-%d %H:%M %Z') %> ·
+    Fuente: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>
+  </footer>
+  <script>
+    // Grey out past hours and highlight the current one in the visitor's browser.
+    var now = Date.now() / 1000;
+    document.querySelectorAll('tbody tr').forEach(function (tr) {
+      var start = Number(tr.dataset.epoch);
+      if (now >= start + 3600) tr.className = 'past';
+      else if (now >= start) tr.className = 'now';
+    });
+  </script>
+</body>
+</html>

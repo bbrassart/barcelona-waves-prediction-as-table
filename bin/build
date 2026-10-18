@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# Fetches the latest forecast and writes _site/index.html.
+ENV['TZ'] ||= 'Europe/Madrid'
+
+require 'fileutils'
+require_relative '../lib/portus_forecast'
+
+code = ENV.fetch('PORTUS_CODE', '712018020')
+scheme = ENV.fetch('PORTUS_SCHEME', 'Siwana')
+station_name = ENV.fetch('PORTUS_STATION_NAME', 'Boya de Barcelona II')
+output_dir = File.expand_path(ENV.fetch('OUTPUT_DIR', '_site'), Dir.pwd)
+
+begin
+  rows = PortusForecast.fetch(code: code, scheme: scheme)
+rescue PortusForecast::Error, SystemCallError, Timeout::Error, SocketError => e
+  abort "Failed to fetch forecast: #{e.message}"
+end
+
+FileUtils.mkdir_p(output_dir)
+html = PortusForecast.render(rows: rows, station_name: station_name, generated_at: Time.now)
+File.write(File.join(output_dir, 'index.html'), html)
+puts "Wrote #{rows.size} rows to #{File.join(output_dir, 'index.html')}"
