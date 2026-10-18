@@ -1,4 +1,3 @@
-https://bbrassart.github.io/barcelona-waves-prediction-as-table/
 
 # Portus waves
 
