@@ -56,8 +56,9 @@ class RenderTest < Minitest::Test
     html = PortusForecast.render(rows: rows, station_name: 'Boya <Test>',
                                  generated_at: Time.at(1_792_290_000))
 
-    assert_includes html, '<td>04h00 18-10-2026</td>'
+    assert_includes html, '04h00 18-10-2026'
     assert_includes html, '<td>0.89</td>'
+    assert_includes html, '<td title="261°">W (261°)</td>'
     assert_includes html, 'Boya &lt;Test&gt;'
     assert_equal 2, html.scan('<tr data-epoch=').size
   end

@@ -12,7 +12,7 @@
     th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; white-space: nowrap; }
     th { background: #2274a5; color: #fff; }
     tr.past { color: #aaa; }
-    tr.first-hour { color: #808080 }
+    tr.midnight { background: #d3d3d3 }
     tr.now { background: #ceecff; font-weight: bold; }
     footer { margin-top: 1rem; font-size: 0.85rem; color: #666; }
   </style>
@@ -33,7 +33,7 @@
     </thead>
     <tbody>
 <% rows.each do |row| -%>
-      <tr data-epoch="<%= row.time.to_i %>">
+      <tr data-epoch="<%= row.time.to_i %>" class="<%= 'midnight' if row.time.hour == 0 %>">
         <td><%= row.time.strftime('%Hh%M %d-%m-%Y') %></td>
         <td><%= format('%.2f', row.wave_height) %></td>
         <td><%= format('%.1f', row.peak_period) %></td>
