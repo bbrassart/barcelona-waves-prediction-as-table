@@ -1,5 +1,5 @@
 
-# Portus waves
+# BCN Surf Forecast
 
 Static page showing the hourly wave forecast (SIWANA model, Puertos del
 Estado) for **Boya de Barcelona II** (code `712018020`): significant wave
