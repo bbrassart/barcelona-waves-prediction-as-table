@@ -60,6 +60,7 @@ class RenderTest < Minitest::Test
     assert_includes html, '<td>0.89</td>'
     assert_includes html, '<td title="261°">W (261°)</td>'
     assert_includes html, 'Boya &lt;Test&gt;'
+    assert_includes html, '<strong id="sun-times" aria-live="polite">Sunrise and sunset: loading...</strong>'
     assert_equal 2, html.scan('<tr data-epoch=').size
   end
 end

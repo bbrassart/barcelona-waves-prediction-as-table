@@ -20,6 +20,7 @@
 <body>
   <h1>Swell – <%= h(station_name) %></h1>
   <p>Updated: <%= generated_at.strftime('%Hh%M %d-%m-%Y') %></p>
+  <p><strong id="sun-times" aria-live="polite">Sunrise and sunset: loading...</strong></p>
   <div class="table-wrap">
   <table>
     <thead>
@@ -48,6 +49,25 @@
     Source: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>
   </footer>
   <script>
+    fetch('https://api.sunrise-sunset.org/v2?lat=41.3851&lng=2.1734')
+      .then(function (response) {
+        if (!response.ok) throw new Error('Sunrise/sunset API request failed');
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data.sunrise || !data.sunset) throw new Error('Sunrise/sunset data unavailable');
+        var formatTime = function (value) {
+          return new Date(value).toLocaleTimeString('en-GB', {
+            timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+          }).replace(':', 'h');
+        };
+        document.getElementById('sun-times').textContent =
+          'Sunrise: ' + formatTime(data.sunrise) + ' | Sunset: ' + formatTime(data.sunset);
+      })
+      .catch(function () {
+        document.getElementById('sun-times').textContent = 'Sunrise and sunset unavailable';
+      });
+
     // Grey out past hours and highlight the current one in the visitor's browser.
     var now = Date.now() / 1000;
     document.querySelectorAll('tbody tr').forEach(function (tr) {
