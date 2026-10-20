@@ -12,13 +12,14 @@
     th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; white-space: nowrap; }
     th { background: #2274a5; color: #fff; }
     tr.past { color: #aaa; }
+    tr.first-hour { color: #808080 }
     tr.now { background: #ceecff; font-weight: bold; }
     footer { margin-top: 1rem; font-size: 0.85rem; color: #666; }
   </style>
 </head>
 <body>
   <h1>Swell – <%= h(station_name) %></h1>
-  <p>Updated: <%= generated_at.strftime('%Hh%M %d-%m-%Y') %> ·</p>
+  <p>Updated: <%= generated_at.strftime('%Hh%M %d-%m-%Y') %></p>
   <div class="table-wrap">
   <table>
     <thead>
@@ -37,7 +38,7 @@
         <td><%= format('%.2f', row.wave_height) %></td>
         <td><%= format('%.1f', row.peak_period) %></td>
         <td><%= format('%.1f', row.mean_period) %></td>
-        <td title="<%= row.direction_degrees.round %>º"><%= row.direction %></td>
+        <td title="<%= row.direction_degrees.round %>°"><%= row.direction %> (<%= row.direction_degrees.round %>°)</td>
       </tr>
 <% end -%>
     </tbody>
