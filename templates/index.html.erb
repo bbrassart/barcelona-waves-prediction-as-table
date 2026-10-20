@@ -17,23 +17,23 @@
   </style>
 </head>
 <body>
-  <h1>Oleaje – <%= h(station_name) %></h1>
-  <p>Previsión SIWANA (Puertos del Estado). Hora local Europe/Madrid.</p>
+  <h1>Swell – <%= h(station_name) %></h1>
+  <p>Updated: <%= generated_at.strftime('%Hh%M %d-%m-%Y') %> ·</p>
   <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th>Fecha/Hora</th>
-        <th>Altura significante Hm0 (m)</th>
-        <th>Periodo de pico Tp (s)</th>
-        <th>Periodo medio Tm02 (s)</th>
-        <th>Dir. media propagación</th>
+        <th>Date/Time</th>
+        <th>Significant wave height Hm0</th>
+        <th>Groundswell Tp (s)</th>
+        <th>Short to medium period Tm02 (s)</th>
+        <th>Swell direction</th>
       </tr>
     </thead>
     <tbody>
 <% rows.each do |row| -%>
       <tr data-epoch="<%= row.time.to_i %>">
-        <td><%= row.time.strftime('%Y-%m-%d %H:%M') %></td>
+        <td><%= row.time.strftime('%Hh%M %d-%m-%Y') %></td>
         <td><%= format('%.2f', row.wave_height) %></td>
         <td><%= format('%.1f', row.peak_period) %></td>
         <td><%= format('%.1f', row.mean_period) %></td>
@@ -44,8 +44,7 @@
   </table>
   </div>
   <footer>
-    Actualizado: <%= generated_at.strftime('%Y-%m-%d %H:%M %Z') %> ·
-    Fuente: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>
+    Source: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>
   </footer>
   <script>
     // Grey out past hours and highlight the current one in the visitor's browser.

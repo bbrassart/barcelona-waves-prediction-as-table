@@ -32,7 +32,7 @@ class ParseTest < Minitest::Test
     rows = PortusForecast.parse(BODY)
 
     assert_equal 2, rows.size
-    assert_equal '2026-10-18 03:00', rows.first.time.strftime('%Y-%m-%d %H:%M')
+    assert_equal '03h00 18-10-2026', rows.first.time.strftime('%Hh%M %d-%m-%Y')
     assert_in_delta 0.66, rows.first.wave_height
     assert_equal 'W', rows.first.direction
   end
@@ -56,7 +56,7 @@ class RenderTest < Minitest::Test
     html = PortusForecast.render(rows: rows, station_name: 'Boya <Test>',
                                  generated_at: Time.at(1_792_290_000))
 
-    assert_includes html, '<td>2026-10-18 04:00</td>'
+    assert_includes html, '<td>04h00 18-10-2026</td>'
     assert_includes html, '<td>0.89</td>'
     assert_includes html, 'Boya &lt;Test&gt;'
     assert_equal 2, html.scan('<tr data-epoch=').size
