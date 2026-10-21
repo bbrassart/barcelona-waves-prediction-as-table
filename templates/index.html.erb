@@ -31,6 +31,7 @@
         <th>Groundswell Tp</th>
         <th>Short period Tm02</th>
         <th>Swell direction</th>
+        <th>Wind</th>
       </tr>
     </thead>
     <tbody>
@@ -41,13 +42,15 @@
         <td><%= format('%.1f', row.peak_period) %></td>
         <td><%= format('%.1f', row.mean_period) %></td>
         <td title="<%= row.direction_degrees.round %>°"><%= row.direction %> (<%= row.direction_degrees.round %>°)</td>
+        <td><% if row.wind_gust && row.wind_direction_degrees %><%= row.wind_gust.round %> kn <%= row.wind_direction %> (<%= row.wind_direction_degrees.round %>°)<% else %>–<% end %></td>
       </tr>
 <% end -%>
     </tbody>
   </table>
   </div>
   <footer>
-    Source: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>
+    Source: <a href="https://portus.puertos.es/">Puertos del Estado – Portus</a>.
+    Wind (Playa del Bogatell): <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
   </footer>
   <script>
     fetch('https://api.sunrise-sunset.org/v2?lat=41.3851&lng=2.1734')

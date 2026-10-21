@@ -16,6 +16,15 @@ rescue PortusForecast::Error, SystemCallError, Timeout::Error, SocketError => e
   abort "Failed to fetch forecast: #{e.message}"
 end
 
+begin
+  # Defaults to Playa del Bogatell, Barcelona.
+  wind = PortusForecast.fetch_wind(lat: ENV.fetch('WIND_LAT', '41.3945'),
+                                   lon: ENV.fetch('WIND_LON', '2.2065'))
+  rows.each { |row| row.wind_gust, row.wind_direction_degrees = wind[row.time.to_i] }
+rescue PortusForecast::Error, SystemCallError, Timeout::Error, SocketError => e
+  warn "Failed to fetch wind, rendering without it: #{e.message}"
+end
+
 FileUtils.mkdir_p(output_dir)
 html = PortusForecast.render(rows: rows, station_name: station_name, generated_at: Time.now)
 File.write(File.join(output_dir, 'index.html'), html)

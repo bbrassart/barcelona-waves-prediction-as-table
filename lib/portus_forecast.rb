@@ -8,6 +8,7 @@ require 'uri'
 module PortusForecast
   API_BASE = 'https://poem.puertos.es/portus/ForecastData'.freeze
   FIELDS = %w[Datetime Hm0 Tp Tm02 MeanDir180].freeze
+  OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast'.freeze
   TEMPLATE_PATH = File.expand_path('../templates/index.html.erb', __dir__)
 
   class Error < StandardError; end
@@ -24,10 +25,15 @@ module PortusForecast
   end
 
   Row = Struct.new(:time, :wave_height, :peak_period, :mean_period, :direction_degrees,
-                   keyword_init: true) do
+                   :wind_gust, :wind_direction_degrees, keyword_init: true) do
     # @return [String] propagation direction as a compass label
     def direction
       Compass.from_degrees(direction_degrees)
+    end
+
+    # @return [String] direction the wind blows from as a compass label
+    def wind_direction
+      Compass.from_degrees(wind_direction_degrees)
     end
   end
 
@@ -52,6 +58,29 @@ module PortusForecast
       raise Error, "Invalid forecast JSON: #{e.message}"
     end
 
+    # @param lat [Numeric]
+    # @param lon [Numeric]
+    # @return [Hash{Integer => Array(Float, Float)}] [gust knots, direction degrees] keyed by epoch seconds
+    def fetch_wind(lat:, lon:)
+      uri = URI(OPEN_METEO_URL)
+      uri.query = URI.encode_www_form(latitude: lat, longitude: lon,
+                                      hourly: 'wind_gusts_10m,wind_direction_10m',
+                                      wind_speed_unit: 'kn', timeformat: 'unixtime')
+      parse_wind(get(uri))
+    end
+
+    # @param body [String] JSON returned by the Open-Meteo forecast endpoint
+    # @return [Hash{Integer => Array(Float, Float)}]
+    def parse_wind(body)
+      hourly = JSON.parse(body)['hourly']
+      raise Error, 'Unexpected Open-Meteo payload' unless hourly.is_a?(Hash) && hourly['time'].is_a?(Array)
+
+      values = Array(hourly['wind_gusts_10m']).zip(Array(hourly['wind_direction_10m']))
+      hourly['time'].zip(values).to_h
+    rescue JSON::ParserError => e
+      raise Error, "Invalid Open-Meteo JSON: #{e.message}"
+    end
+
     # @param rows [Array<Row>]
     # @param station_name [String]
     # @param generated_at [Time]
@@ -67,7 +96,7 @@ module PortusForecast
                                                      open_timeout: 15, read_timeout: 30) do |http|
         http.get(uri.request_uri)
       end
-      raise Error, "Portus API returned HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+      raise Error, "#{uri.host} returned HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
 
       response.body
     end
